@@ -534,7 +534,11 @@ body[data-hero='true'] .header:not(.is-scrolled) .lang button[aria-pressed='true
 /* ---------------------------------------------------------------- marquee */
 .marquee { position: relative; width: 100%; }
 .marquee__viewport { overflow: hidden; }
-.marquee__track { display: flex; width: max-content; gap: 20px; padding-block: 4px; animation: marquee-left var(--marquee-duration, 64s) linear infinite; will-change: transform; }
+.marquee__track { display: flex; justify-content: flex-start; gap: 20px; padding-block: 4px; animation: marquee-left var(--marquee-duration, 64s) linear infinite; will-change: transform; }
+/* No `width: max-content` on purpose. Its intrinsic size is driven by each card's
+   unwrapped text, which leaves free space the flex box then distributes between
+   items (80px each here). Letting the row simply overflow the clipped viewport
+   keeps card spacing exactly `card + gap`. */
 .marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
 @keyframes marquee-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(var(--marquee-shift, -50%),0,0); } }
 .marquee__mask { pointer-events: none; position: absolute; inset-block: 0; width: 4rem; z-index: 1; }
