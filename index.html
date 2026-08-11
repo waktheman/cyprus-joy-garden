@@ -186,8 +186,6 @@ address { font-style: normal; }
 .hero .lede { color: rgba(255,255,255,0.85); margin-top: 1.5rem; max-width: 34rem; font-size: 1.0625rem; line-height: 1.7; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
 .hero__note { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: 1.25rem; }
-.hero__rating { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1.5rem; padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 999px; font-size: 0.875rem; color: rgba(255,255,255,0.8); }
-.hero__rating strong { color: #fff; font-weight: 500; }
 .hero__eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; }
 .hero__eyebrow svg { width: 0.875rem; height: 0.875rem; }
 .scroll-cue { position: absolute; inset-inline: 0; bottom: 1.25rem; margin-inline: auto; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.65rem; letter-spacing: 0.28em; text-transform: uppercase; transition: color 300ms; }
@@ -1329,10 +1327,6 @@ window.BLOCKS = (() => {
             <a class="btn btn--glass" href="tel:+35799123456">${icon('phone')} +357 99 123 456</a>
           </div>
           <p class="hero__note">Free site visits · Fixed written quotes · No obligation</p>
-          <div class="hero__rating">
-            ${B.stars(D.REVIEW_SUMMARY.rating)}
-            <span><strong>${D.REVIEW_SUMMARY.rating}</strong> &middot; ${D.REVIEW_SUMMARY.count} ${D.REVIEW_SUMMARY.source}</span>
-          </div>
         </div>
       </div></div>
       <a class="scroll-cue" href="#services-anchor"><span>${t('common.scroll')}</span>${icon('chevronDown')}</a>
