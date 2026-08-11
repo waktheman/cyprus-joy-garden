@@ -534,9 +534,9 @@ body[data-hero='true'] .header:not(.is-scrolled) .lang button[aria-pressed='true
 /* ---------------------------------------------------------------- marquee */
 .marquee { position: relative; width: 100%; }
 .marquee__viewport { overflow: hidden; }
-.marquee__track { display: flex; width: max-content; gap: 20px; padding-block: 4px; animation: marquee-left 64s linear infinite; will-change: transform; }
+.marquee__track { display: flex; width: max-content; gap: 20px; padding-block: 4px; animation: marquee-left var(--marquee-duration, 64s) linear infinite; will-change: transform; }
 .marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
-@keyframes marquee-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(-50% - 10px),0,0); } }
+@keyframes marquee-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(var(--marquee-shift, -50%),0,0); } }
 .marquee__mask { pointer-events: none; position: absolute; inset-block: 0; width: 4rem; z-index: 1; }
 .marquee__mask--l { left: 0; background: linear-gradient(to right, color-mix(in oklch, var(--secondary) 40%, var(--background)), transparent); }
 .marquee__mask--r { right: 0; background: linear-gradient(to left, color-mix(in oklch, var(--secondary) 40%, var(--background)), transparent); }
@@ -1645,6 +1645,26 @@ window.BLOCKS = (() => {
     registerCanvases(container); activateReveals(container);
   }
 
+
+  /**
+   * The track is `width: max-content`, whose intrinsic size is driven by each
+   * card's *unwrapped* text and so overshoots the width the cards actually
+   * render at — `-50%` would leave a gap and jump each cycle. Measure the
+   * offset from a card to its clone instead: that is exactly one set.
+   */
+  const PX_PER_SEC = 26;
+  function setupMarquee(root) {
+    root.querySelectorAll('.marquee__track').forEach((track) => {
+      const kids = track.children;
+      const half = kids.length / 2;
+      if (!Number.isInteger(half) || half < 1) return;
+      const shift = kids[half].offsetLeft - kids[0].offsetLeft;
+      if (shift <= 0) return;
+      track.style.setProperty('--marquee-shift', `-${shift}px`);
+      track.style.setProperty('--marquee-duration', `${(shift / PX_PER_SEC).toFixed(2)}s`);
+    });
+  }
+
   /* ------------------------------------------------------- before/after UI */
   function wireBeforeAfter(root) {
     root.querySelectorAll('[data-ba]').forEach((fig) => {
@@ -1819,6 +1839,7 @@ window.BLOCKS = (() => {
     activateReveals(main);
     wireBeforeAfter(main);
     wireForms(main);
+    setupMarquee(main);
     if (path === '/') fillMasonry(document.getElementById('home-grid'), D.PROJECTS.slice(0, 6), (p) => B.projectTile(p, false));
     if (path === '/portfolio') renderPortfolio();
     onScroll();
@@ -1844,6 +1865,7 @@ window.BLOCKS = (() => {
     }
   });
 
+  window.addEventListener('resize', () => setupMarquee(document));
   let colTimer;
   window.addEventListener('resize', () => {
     clearTimeout(colTimer);
