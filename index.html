@@ -179,15 +179,10 @@ address { font-style: normal; }
 .hero__scrim { position: absolute; inset: 0; z-index: -1; background-image: var(--gradient-hero); }
 .hero__body { padding-block: 9rem 5rem; }
 @media (min-width: 768px) { .hero__body { padding-block: 11rem 7rem; } }
-.hero__split { display: grid; gap: 3rem; align-items: center; }
-@media (min-width: 1024px) { .hero__split { grid-template-columns: 1.15fr 1fr; gap: 4rem; } }
 .hero h1 { color: #fff; font-size: clamp(2.25rem, 6vw, 3.75rem); line-height: 1.06; margin-top: 1.25rem; }
 .hero .lede { color: rgba(255,255,255,0.85); margin-top: 1.5rem; max-width: 34rem; font-size: 1.0625rem; line-height: 1.7; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
 .hero__note { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: 1.25rem; }
-.hero__proof { display: none; }
-@media (min-width: 1024px) { .hero__proof { display: block; border-radius: calc(var(--radius) + 12px); background: rgba(10,26,18,0.55); padding: 0.75rem; box-shadow: var(--shadow-lift); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.18); } }
-.hero__proof .cap { font-size: 0.75rem; color: rgba(255,255,255,0.8); padding: 0.75rem 0.25rem 0.25rem; }
 .hero__eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; }
 .hero__eyebrow svg { width: 0.875rem; height: 0.875rem; }
 .scroll-cue { position: absolute; inset-inline: 0; bottom: 1.25rem; margin-inline: auto; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.65rem; letter-spacing: 0.28em; text-transform: uppercase; transition: color 300ms; }
@@ -534,6 +529,30 @@ body[data-hero='true'] .header:not(.is-scrolled) .icon-btn:hover { background: r
 body[data-hero='true'] .header:not(.is-scrolled) .lang { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); }
 body[data-hero='true'] .header:not(.is-scrolled) .lang button { color: rgba(255,255,255,0.75); }
 body[data-hero='true'] .header:not(.is-scrolled) .lang button[aria-pressed='true'] { background: rgba(255,255,255,0.92); color: #1b4332; }
+
+
+/* ---------------------------------------------------------------- marquee */
+.marquee { position: relative; width: 100%; }
+.marquee__viewport { overflow: hidden; }
+.marquee__track { display: flex; width: max-content; gap: 20px; padding-block: 4px; animation: marquee-left 64s linear infinite; will-change: transform; }
+.marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
+@keyframes marquee-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(-50% - 10px),0,0); } }
+.marquee__mask { pointer-events: none; position: absolute; inset-block: 0; width: 4rem; z-index: 1; }
+.marquee__mask--l { left: 0; background: linear-gradient(to right, color-mix(in oklch, var(--secondary) 40%, var(--background)), transparent); }
+.marquee__mask--r { right: 0; background: linear-gradient(to left, color-mix(in oklch, var(--secondary) 40%, var(--background)), transparent); }
+.review-card { display: flex; flex-direction: column; gap: 1rem; width: min(22rem, calc(100vw - 4rem)); flex: none; background: var(--card); border: 1px solid var(--border); border-radius: calc(var(--radius) + 8px); padding: 1.5rem; box-shadow: var(--shadow-soft); }
+.review-card .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.review-card .when { font-size: 0.75rem; color: var(--muted-foreground); }
+.review-card blockquote { margin: 0; font-size: 0.95rem; line-height: 1.7; }
+.review-card figcaption { margin-top: auto; padding-top: 0.5rem; }
+.review-card .who { font-size: 0.875rem; font-weight: 500; display: block; }
+.review-card .where { font-size: 0.75rem; color: var(--muted-foreground); display: block; }
+@media (prefers-reduced-motion: reduce) {
+  /* The global reduce block forces a 0.01ms duration, which would snap the loop
+     to its end frame — kill the animation outright and let the rail scroll. */
+  .marquee__track { animation-name: none !important; transform: none !important; }
+  .marquee__viewport { overflow-x: auto; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -1110,22 +1129,33 @@ window.BLOCKS = (() => {
       </ol>
     </section>`;
 
+  const reviewCard = (r) => `
+    <figure class="review-card">
+      <div class="top">${stars(r.rating)}<span class="when">${r.date}</span></div>
+      <blockquote>&ldquo;${r.quote}&rdquo;</blockquote>
+      <figcaption><span class="who">${r.name}</span><span class="where">${r.role} &middot; ${r.location}</span></figcaption>
+    </figure>`;
+
   const reviewsSection = () => `
-    <section class="section container-page" aria-label="Client reviews">
-      ${heading('Reviews', 'What our clients say', 'Rated by homeowners, hoteliers and facilities managers across all four regions we serve.')}
-      <div class="rating-summary reveal">
-        <div class="row">${stars(D.REVIEW_SUMMARY.rating, 'stars--lg')}<span class="val">${D.REVIEW_SUMMARY.rating}</span></div>
-        <p class="src">from ${D.REVIEW_SUMMARY.count} ${D.REVIEW_SUMMARY.source}</p>
+    <section class="band-secondary" aria-label="Client reviews"><div class="section">
+      <div class="container-page">
+        ${heading('Reviews', 'What our clients say', 'Rated by homeowners, hoteliers and facilities managers across all four regions we serve.')}
+        <div class="rating-summary reveal">
+          <div class="row">${stars(D.REVIEW_SUMMARY.rating, 'stars--lg')}<span class="val">${D.REVIEW_SUMMARY.rating}</span></div>
+          <p class="src">from ${D.REVIEW_SUMMARY.count} ${D.REVIEW_SUMMARY.source}</p>
+        </div>
       </div>
-      <ul class="grid grid--2" style="margin-top:3rem">
-        ${D.REVIEWS.map((r, i) => `
-          <li class="reveal" style="transition-delay:${i * 80}ms"><div class="card review-card">
-            <div class="top">${stars(r.rating)}<span class="when">${r.date}</span></div>
-            <blockquote>“${r.quote}”</blockquote>
-            <footer><span class="who">${r.name}</span><span class="where">${r.role} · ${r.location}</span></footer>
-          </div></li>`).join('')}
-      </ul>
-    </section>`;
+      <div class="reveal marquee" style="margin-top:3rem">
+        <div class="marquee__viewport">
+          <div class="marquee__track">
+            ${D.REVIEWS.map(reviewCard).join('')}
+            ${D.REVIEWS.map((r) => reviewCard(r).replace('<figure class="review-card">', '<figure class="review-card" aria-hidden="true">')).join('')}
+          </div>
+        </div>
+        <div class="marquee__mask marquee__mask--l"></div>
+        <div class="marquee__mask marquee__mask--r"></div>
+      </div>
+    </div></section>`;
 
   const plansSection = () => `
     <section class="band-secondary" aria-label="Maintenance plans and seasonal offer"><div class="section container-page">
@@ -1274,12 +1304,11 @@ window.BLOCKS = (() => {
   const pages = {};
 
   pages['/'] = () => {
-    const f = D.PROJECTS[0];
     return `
     <section class="hero">
       <div class="hero__art">${plate('home-hero','golden','water','16/9','')}</div>
       <div class="hero__scrim"></div>
-      <div class="container-page hero__body"><div class="hero__split">
+      <div class="container-page hero__body"><div>
         <div>
           <span class="eyebrow eyebrow--light hero__eyebrow">${icon('pin')} ${D.REGIONS.join(' · ')}</span>
           <h1>Garden Design &amp; Landscaping in Cyprus</h1>
@@ -1290,10 +1319,6 @@ window.BLOCKS = (() => {
           </div>
           <p class="hero__note">Free site visits · Fixed written quotes · No obligation</p>
         </div>
-        <div class="reveal"><div class="hero__proof">
-          ${B.beforeAfter(f, { initial: 42, suffix: '-hero' })}
-          <p class="cap"><strong>${f.title}</strong> · ${f.location} — drag to compare</p>
-        </div></div>
       </div></div>
       <a class="scroll-cue" href="#services-anchor"><span>${t('common.scroll')}</span>${icon('chevronDown')}</a>
     </section>
