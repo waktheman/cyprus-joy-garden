@@ -44,9 +44,10 @@
   --shadow-lift: 0 2px 4px oklch(0.3 0.05 130 / 0.06), 0 18px 48px oklch(0.3 0.05 130 / 0.16);
   --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Hoefler Text', 'Book Antiqua', Georgia, serif;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, 'Helvetica Neue', sans-serif;
-}
 
-@media (prefers-color-scheme: dark) { :root { color-scheme: dark;
+  /* Locked to one palette so phone and laptop match regardless of the
+     visitor's system light/dark setting. Swap this block for the light
+     values (kept under :root[data-theme='light']) to flip the site. */
   --background: oklch(0.19 0.022 150); --foreground: oklch(0.94 0.012 95); --card: oklch(0.23 0.026 150);
   --primary: oklch(0.68 0.13 148); --primary-foreground: oklch(0.17 0.03 150);
   --secondary: oklch(0.3 0.03 85); --secondary-foreground: oklch(0.93 0.02 85);
@@ -58,7 +59,8 @@
   --gradient-leaf: linear-gradient(135deg, oklch(0.3 0.09 148) 0%, oklch(0.45 0.13 145) 100%);
   --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 8px 24px oklch(0 0 0 / 0.35);
   --shadow-lift: 0 2px 4px oklch(0 0 0 / 0.35), 0 18px 48px oklch(0 0 0 / 0.5);
-} }
+}
+
 
 :root[data-theme='dark'] { color-scheme: dark;
   --background: oklch(0.19 0.022 150); --foreground: oklch(0.94 0.012 95); --card: oklch(0.23 0.026 150);
@@ -184,6 +186,8 @@ address { font-style: normal; }
 .hero .lede { color: rgba(255,255,255,0.85); margin-top: 1.5rem; max-width: 34rem; font-size: 1.0625rem; line-height: 1.7; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
 .hero__note { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: 1.25rem; }
+.hero__rating { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1.5rem; padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 999px; font-size: 0.875rem; color: rgba(255,255,255,0.8); }
+.hero__rating strong { color: #fff; font-weight: 500; }
 .hero__eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; }
 .hero__eyebrow svg { width: 0.875rem; height: 0.875rem; }
 .scroll-cue { position: absolute; inset-inline: 0; bottom: 1.25rem; margin-inline: auto; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.65rem; letter-spacing: 0.28em; text-transform: uppercase; transition: color 300ms; }
@@ -451,7 +455,10 @@ address { font-style: normal; }
 .rating-summary .src { font-size: 0.875rem; color: var(--muted-foreground); }
 
 .logo-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.25rem 3rem; }
-.logo-row li { font-family: var(--font-display); font-size: 1.25rem; color: color-mix(in oklch, var(--muted-foreground) 70%, transparent); transition: color 500ms; }
+.logo-row li { display: flex; align-items: center; gap: 0.6rem; color: color-mix(in oklch, var(--muted-foreground) 80%, transparent); transition: color 500ms; }
+.logo-row li svg { width: 1.3rem; height: 1.3rem; flex: none; }
+.logo-row .an { font-family: var(--font-display); font-size: 1.15rem; display: block; line-height: 1.2; }
+.logo-row .ad { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.75; display: block; }
 .logo-row li:hover { color: var(--foreground); }
 
 .cta-banner { position: relative; isolation: isolate; overflow: hidden; }
@@ -682,6 +689,7 @@ body[data-hero='true'] .header:not(.is-scrolled) .lang button[aria-pressed='true
     clock: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`,
     calendar: `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>`,
     send: `<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>`,
+    building: `<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/>`,
     info: `<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>`,
     instagram: `<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>`,
     facebook: `<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3Z"/>`,
@@ -1035,12 +1043,6 @@ window.DATA = (() => {
     { quote:'Two previous gardens died to the salt wind before we called them. They fixed the soil, built a windbreak, planted things that belong on this coast — and it has thickened every year since.', name:'Helen Whitcombe', role:'Private client', location:'Peyia, Paphos', rating:5, date:'September 2025' }
   ];
 
-  const WHY = [
-    { icon:'recycle', title:'Eco-friendly by default', body:'Peat-free composts, on-site green-waste recycling, pesticide-free management and planting chosen to need less, not to be rescued more.' },
-    { icon:'leaf', title:'Local plants expertise', body:'Olive, carob, lentisk, cistus, phlomis, teucrium. We know which Cypriot natives thrive on which aspect — and which imported favourites will disappoint you.' },
-    { icon:'sun', title:'Cyprus climate specialists', body:'We design for forty-degree afternoons, salt wind and a rainless summer — the conditions your garden actually faces, not an imported ideal.' },
-    { icon:'droplets', title:'Water efficiency', body:'Zoned drip irrigation, weather-aware controllers and rainwater harvesting typically cut garden water use by well over half.' }
-  ];
 
   const VALUES = [
     { icon:'leaf', title:'Plant what belongs', body:'The right species for the aspect, the soil and the rainfall. Beauty that does not depend on constant intervention.' },
@@ -1074,11 +1076,15 @@ window.DATA = (() => {
       excerpt:'Shade, litter, salt and bare feet. The four constraints that shape every good pool surround, and the planting palette that satisfies all of them at once.' }
   ];
 
-  const LOGOS = ['Amathus Estates','Aphrodite Hills Resort','Omodos Winery','Limassol Marina','Kyrenia Developments','Troodos Retreats'];
+  const ACCREDITATIONS = [
+    { icon:'recycle', name:'ISO 14001', detail:'Environmental management' },
+    { icon:'award', name:'ELCA', detail:'European Landscape Contractors' },
+    { icon:'building', name:'CCCI', detail:'Cyprus Chamber of Commerce' },
+  ];
   const REGIONS = ['Limassol','Paphos','Nicosia','Larnaca'];
   const HOURS = [['Monday – Friday','08:00 – 18:00'],['Saturday','09:00 – 14:00'],['Sunday','Closed — emergency irrigation callouts only']];
 
-  return { SERVICES, PROJECTS, TRUST, PROCESS, PLANS, OFFER, FAQS, REVIEW_SUMMARY, REVIEWS, WHY, VALUES, TEAM, CERTS, POSTS, LOGOS, REGIONS, HOURS };
+  return { SERVICES, PROJECTS, TRUST, PROCESS, PLANS, OFFER, FAQS, REVIEW_SUMMARY, REVIEWS, VALUES, TEAM, CERTS, POSTS, ACCREDITATIONS, REGIONS, HOURS };
 })();
 </script>
 
@@ -1323,6 +1329,10 @@ window.BLOCKS = (() => {
             <a class="btn btn--glass" href="tel:+35799123456">${icon('phone')} +357 99 123 456</a>
           </div>
           <p class="hero__note">Free site visits · Fixed written quotes · No obligation</p>
+          <div class="hero__rating">
+            ${B.stars(D.REVIEW_SUMMARY.rating)}
+            <span><strong>${D.REVIEW_SUMMARY.rating}</strong> &middot; ${D.REVIEW_SUMMARY.count} ${D.REVIEW_SUMMARY.source}</span>
+          </div>
         </div>
       </div></div>
       <a class="scroll-cue" href="#services-anchor"><span>${t('common.scroll')}</span>${icon('chevronDown')}</a>
@@ -1354,19 +1364,12 @@ window.BLOCKS = (() => {
       </div>
     </div></section>
 
-    <section class="section container-page">
-      ${B.heading('Why choose us', 'Built for Cyprus, not imported from somewhere wetter', 'Anyone can plant a garden in April. Keeping it beautiful through a rainless August — on a sensible water budget — is the actual craft.')}
-      <ul class="why-grid">
-        ${D.WHY.map((w, i) => `<li class="reveal" style="transition-delay:${i * 80}ms"><div class="why-cell"><span class="why-item__icon">${icon(w.icon)}</span><h3>${w.title}</h3><p>${w.body}</p></div></li>`).join('')}
-      </ul>
-    </section>
-
     ${B.reviewsSection()}
 
     <section style="border-top:1px solid var(--border)"><div class="container-page" style="padding-block:3rem">
       <div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:1.5rem">
-        <span class="eyebrow" style="color:var(--muted-foreground)">Trusted by</span>
-        <ul class="logo-row">${D.LOGOS.map((l) => `<li>${l}</li>`).join('')}</ul>
+        <span class="eyebrow" style="color:var(--muted-foreground)">Accredited by</span>
+        <ul class="logo-row">${D.ACCREDITATIONS.map((a) => `<li>${icon(a.icon)}<span><span class="an">${a.name}</span><span class="ad">${a.detail}</span></span></li>`).join('')}</ul>
       </div>
     </div></section>
 
@@ -1903,9 +1906,12 @@ var k="1.1.18";function w(r,t,e){return Math.max(r,Math.min(t,e))}function W(r,t
     lenis = new Lenis({
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      // Native inertia on touch is already good and hijacking it causes jank.
       smoothWheel: true,
-      syncTouch: false,
+      // Momentum on touch as well; the multiplier and lerp keep it close to
+      // native so it doesn't fight the thumb.
+      syncTouch: true,
+      touchMultiplier: 1.6,
+      syncTouchLerp: 0.075,
     });
     function raf(time) { lenis && lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
